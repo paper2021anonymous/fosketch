@@ -26,7 +26,7 @@ Note that *_HW requires SGX-enabled hardware to execute.
 `./app` to run the prototype service
 
 ## Test
-If you want to test the performanc of our FO-Sketch, you should uncomment some codes in `FOS_test_ecall()` from `FOSketch/App.cpp`, `ecall_fos_test()` from `FOSketch/Enclave/Enclave.cpp`, some macros in `Common/CommonUtil.h` and macro `COUNT_ACCESS` in `FOSketch/FOSketch.h`.
+If you want to test the performanc of our FO-Sketch, you should uncomment some test codes in `FOS_test_ecall()` from `FOSketch/App.cpp`, `ecall_fos_test()` from `FOSketch/Enclave/Enclave.cpp`, some test macros in `Common/CommonUtil.h` and macro `COUNT_ACCESS` in `FOSketch/FOSketch.h`.
 
 Enjoy!
 
