@@ -1,0 +1,12 @@
+./app  -O -c -F 1 -E 0 -H 3 -L 3 -M 60 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 1 -E 100 -H 3 -L 3 -M 90 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 2 -E 0 -H 3 -L 3 -M 119 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 2 -E 100 -H 3 -L 3 -M 120 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 3 -E 0 -H 3 -L 3 -M 180 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 4 -E 0 -H 3 -L 3 -M 239 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 4 -E 100 -H 3 -L 3 -M 240 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 6 -E 0 -H 3 -L 3 -M 360 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 8 -E 0 -H 3 -L 3 -M 479 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 8 -E 100 -H 3 -L 3 -M 480 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 12 -E 0 -H 3 -L 3 -M 720 -R 10 -f sketch.data >> oflowdist_64B_raw.dat
+./app  -O -c -F 16 -E 0 -H 3 -L 3 -M 959 -R 10 -f sketch.data >> oflowdist_64B_raw.dat

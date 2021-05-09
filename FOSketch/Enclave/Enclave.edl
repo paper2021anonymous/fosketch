@@ -1,0 +1,17 @@
+enclave {
+    from "sgx_tstdc.edl" import *;
+    from "sgx_tswitchless.edl" import *;
+
+    trusted {
+
+        public void ecall_init([in, size = key_size] unsigned char *ctx, size_t key_size);
+        public void ecall_fos_test([user_check]void *sa) transition_using_threads;
+        public void ecall_bare([user_check]void *sa);
+        public void ecall_print_count();
+    };
+    untrusted {
+        void ocall_print_string([in, string] const char *str);// transition_using_threads;
+        void ocall_bare_switchless(int count) transition_using_threads;
+        void ocall_bare(int count);
+    };
+};
