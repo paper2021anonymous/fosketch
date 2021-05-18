@@ -5,14 +5,6 @@
 
 using namespace std;
 
-//Hash
-//-----------------------------
-struct Data
-{
-  uint32_t key;
-  uint32_t value;
-};
-
 void printf( const char *fmt, ...)
 {
     char buf[BUFSIZ] = {'\0'};

@@ -22,8 +22,6 @@
 #define GCM_IV_SIZE     12
 #define GCM_MAC_SIZE    16
 
-
-//VIVIAN
 //#define NEED_TEST
 typedef uint16_t bid_t;
 
@@ -85,6 +83,7 @@ typedef struct CDist
 //(CUSKETCH_MEM+HEAVY_MEM)
 #define TOTAL_MEM (CUSKETCH_MEM+HEAVY_MEM)
 #define HEAVY_KEY_SIZE 4
+#define FLOW_KEY_SIZE HEAVY_KEY_SIZE
 #define HEAVY_VALUE_SIZE 4
 //(HEAVY_KEY_SIZE+HEAVY_VALUE_SIZE)
 #define HEAVY_PAIR_SIZE 8
@@ -145,39 +144,6 @@ inline bool testPo2(uint64_t num){
     if(num == (1L << level)) return true;
     return false;
 }
-//---------------------------------------------------------
-
-struct FIVE_TUPLE {
-    char key[13];
-};
-
-struct FLOW_KEY {   // 13 bytes
-    // 8 (4*2) bytes
-    uint32_t src_ip;  // source IP address
-    uint32_t dst_ip;
-    // 4 (2*2) bytes
-    uint16_t src_port;
-    uint16_t dst_port;
-    // 1 bytes
-    uint8_t proto;
-};
-
-#define COUNTER_PER_BUCKET 8
-
-#define bool_extend(val) (-(val) >> 32)
-#define get_min(x, y) ((uint32_t) y & bool_extend(x > y)) | ((uint32_t) x & bool_extend(x <= y))
-#define selector(x, y, bit) ((uint32_t) x & bool_extend(bit)) | ((uint32_t) y & bool_extend(!bit))
-#define swap_threshold(negative_val, val) (negative_val > (val << 3))
-#define get_flag(val) (((uint32_t)(val) & 0x80000000) == 0x80000000)
-#define get_val(val) ((uint32_t)((val) & 0x7FFFFFFF))
-
-// sketch definitions
-//#define TOTAL_MEM 600 * 1024    // 600 KB
-#define FLOW_KEY_SIZE 4
-
-#define FLOW_ID_SIZE sizeof(struct FIVE_TUPLE)
-#define HEAVY_HITTER_SIZE 20
-#define HEAVY_CHANGE_THRESHOLD 0.05
 
 #ifdef __cplusplus
 extern "C" {
