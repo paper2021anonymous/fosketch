@@ -174,7 +174,7 @@ Enclave_t.o: Enclave_t.c
 	$(CC) $(Enclave_C_Flags) -c  $< -o $@
 	@echo "CC  <=  $<"
 
-$(Enclave_Name): Enclave_t.o $(Enclave_Cpp_Objects) $(Enclave_C_Objects) cuckoo_hash.o lookup3.o
+$(Enclave_Name): Enclave_t.o $(Enclave_Cpp_Objects) $(Enclave_C_Objects)
 	$(CXX)  $^ -o $@ $(Enclave_Link_Flags)
 	cp $(Enclave_Name) ../
 	@echo "LINK =>  $@"
