@@ -18,7 +18,7 @@ git clone https://github.com/paper2021anonymous/fosketch.git
 cd fosketch/FOSketch
 make
 ```
-Note that *_HW requires SGX-enabled hardware to execute.
+Note that **FO-Sketch** requires SGX-enabled hardware to execute.
 
 ## Usage
 `./app -h` for help
