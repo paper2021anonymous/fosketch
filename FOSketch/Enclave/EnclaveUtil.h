@@ -20,7 +20,7 @@
 
 using namespace std;
 
-void testCuckHash(uint32_t nKey);
+// void testCuckHash(uint32_t nKey);
 
 // bool Init_OCU(size_t w_sk, size_t sizeBl, size_t sizeBk, uint8_t compStash);
 // void LinearAccess(uint32_t repeats);

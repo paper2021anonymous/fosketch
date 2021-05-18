@@ -233,8 +233,8 @@ void readSketchFile(const char *trace_prefix) {
 }
 
 void FOS_test_ecall(Message * pMsgSketch, uint32_t cap,
-        uint32_t rept,uint8_t isObliv,uint8_t sizeBlockH,uint8_t sizeBlockL,
-        uint8_t sizeBk,uint32_t nKey=CUCKOO_KEYS, uint8_t compStash = 1,
+        uint32_t rept,uint8_t isObliv,uint8_t sizeBlockH,
+        uint8_t sizeBlockL, uint8_t sizeBk, uint8_t compStash = 1,
         uint32_t tFactor=1, uint32_t tElmt=0) 
 {
     srand (time(NULL));
@@ -316,11 +316,11 @@ void FOS_test_ecall(Message * pMsgSketch, uint32_t cap,
             }
             //CAPACITY_BASE+CAPACITY_DELTA*sa[2] repeats: REPEAT_BASE*sa[3] block_size: 8*(1<<sa[1])
             
-            // uint64_t sa[9] = {j,i,
-            //         cap,rept,isObliv,sizeBk,nKey,compStash,
+            // uint64_t sa[8] = {j,i,
+            //         cap,rept,isObliv,sizeBk,compStash,
             //         (uint64_t)pMsgSketch};
-            uint64_t sa[12] = {j,i,
-                    cap,rept,isObliv,sizeBk,nKey,compStash,
+            uint64_t sa[11] = {j,i,
+                    cap,rept,isObliv,sizeBk,compStash,
                     (uint64_t)pMsgSketch, (uint64_t)pLargeData,
                     tFactor, tElmt};
             ecall_fos_test(global_eid, sa);
@@ -375,7 +375,6 @@ int main(int argc, char **argv) {
     uint32_t repeat_index = 1;
     uint8_t sizeBlockH = 3, sizeBlockL = 3, sizeBk = 5 ;
 
-    uint32_t nKey = CUCKOO_KEYS;
     uint8_t compStash = 1;
     uint32_t tFactor = 1;
     uint32_t tElmt = 0;
@@ -397,7 +396,6 @@ int main(int argc, char **argv) {
             "H:"
             "L:"
             "B:"
-            "K:"
             "F:"
             "E:"
             "h"
@@ -414,7 +412,6 @@ int main(int argc, char **argv) {
         case 'H': sizeBlockH = atoi(optarg); break;
         case 'L': sizeBlockL = atoi(optarg); break;
         case 'B': sizeBk = atoi(optarg); break;
-        case 'K': nKey = atoi(optarg); break;
         case 'F': tFactor = atoi(optarg); break;
         case 'E': tElmt = atoi(optarg); break;
         case 'f': traceFilePrefix = optarg; break;
@@ -461,7 +458,7 @@ int main(int argc, char **argv) {
                 REPEAT_BASE*repeat_index/1000, isObliv,
                 8*(1<<sizeBlockH), 8*(1<<sizeBlockL));
     FOS_test_ecall(&msgSketch, capacity_index, repeat_index, isObliv,
-        sizeBlockH,sizeBlockL,sizeBk,nKey,compStash,tFactor,tElmt);
+        sizeBlockH,sizeBlockL,sizeBk,compStash,tFactor,tElmt);
     printf("-----------------------------------------------\n");
 
     gettimeofday(&tval_after, NULL);

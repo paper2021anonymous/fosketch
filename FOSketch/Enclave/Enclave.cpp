@@ -414,15 +414,15 @@ void ecall_fos_test(void *sa){
     Item *respHH = NULL;
     Item *respHC = NULL;
     BitonicSorter bsItemDESC(&smallerItem, sizeof(Item), false);
-    //pData1 = ((uint8_t **)(in[8]))[0];
-    //pData2 = ((uint8_t **)(in[8]))[1];
+    //pData1 = ((uint8_t **)(in[7]))[0];
+    //pData2 = ((uint8_t **)(in[7]))[1];
     Item *HHList = NULL;
     uint8_t level = 0;
     uint32_t length = 0;
     uint32_t numHC = 0;
     uint32_t delta = 0;
-    uint32_t factor = in[10];
-    uint32_t moreElem = in[11]; //100;
+    uint32_t factor = in[9];
+    uint32_t moreElem = in[10]; //100;
     uint64_t round = 0;
     //TODO: Need more effort to make the experiment easy to conduct.
     //TODO: Should add encryption and decryption for more test.
@@ -432,23 +432,23 @@ void ecall_fos_test(void *sa){
                    "Rebuild data (metrics and global sketch):");
             noMoreTest = 0;
             //Notice: Mimic the heavy hitter in the previous epoch.
-            //memcpy((uint8_t *)HeavyHitterList, ((uint8_t **)(in[8]))[0]+2+CUSKETCH_MEM, HEAVY_MEM);
-            OPrepareData((Message *)(in[8]), &ctx);
+            //memcpy((uint8_t *)HeavyHitterList, ((uint8_t **)(in[7]))[0]+2+CUSKETCH_MEM, HEAVY_MEM);
+            OPrepareData((Message *)(in[7]), &ctx);
             //------------------
             // //for Test PORAM performance:
             // //pDataForCUSketch = malloc_align(1024*(cap_base+cap_del*in[2]), 64, &pDataCUSketch);
-            // // memcpy(pDataCUSketch, (uint8_t *)in[9], 1024*(cap_base+cap_del*in[2]));
+            // // memcpy(pDataCUSketch, (uint8_t *)in[8], 1024*(cap_base+cap_del*in[2]));
             // printf("Memsize: %zu\n", CAPACITY_UNIT*in[2]);
             // pDataForCUSketch = malloc_align(CAPACITY_UNIT*in[2], 64, &pDataCUSketch);
-            // memcpy(pDataCUSketch, (uint8_t *)in[9], CAPACITY_UNIT*in[2]);
+            // memcpy(pDataCUSketch, (uint8_t *)in[8], CAPACITY_UNIT*in[2]);
             //------------------------------------
             //for merge two light parts
             // pData = malloc_align(CUSKETCH_MEM*32, 64, &pData1);
-            // memcpy(pData1, (uint8_t *)in[9],CUSKETCH_MEM*32);
+            // memcpy(pData1, (uint8_t *)in[8],CUSKETCH_MEM*32);
             //----------------------------------
             // //for heavy part flow distribution
             // pData = malloc_align(HEAVY_MEM*32, 64, &pData1);
-            // memcpy(pData1, (uint8_t *)in[9],HEAVY_MEM*32);
+            // memcpy(pData1, (uint8_t *)in[8],HEAVY_MEM*32);
             // //sort the data
             // if(testPo2(NUM_HEAVY/2+moreElem)){
             //     OddEvenMergeSorter oeItemDESC(&smallerItem, sizeof(Item), false);
@@ -460,7 +460,7 @@ void ecall_fos_test(void *sa){
             //-----------------------
             // //heavy-change candidates
             // pData1 = (uint8_t *)HeavyHitterList;
-            // memcpy(pData1, (uint8_t *)in[9],HEAVY_MEM*32);
+            // memcpy(pData1, (uint8_t *)in[8],HEAVY_MEM*32);
             // // level = ceil(log2(HEAVY_MEM*1));
             // // length = 1 << level;
             // pData2 = pData1 + (NUM_HEAVY*factor+moreElem)*HEAVY_PAIR_SIZE;
@@ -473,7 +473,7 @@ void ecall_fos_test(void *sa){
             //------------------------
             // //heavy-hitter candidates
             // pData1 = (uint8_t *)HeavyHitterList;
-            // memcpy(pData1, (uint8_t *)in[9],HEAVY_MEM*32);
+            // memcpy(pData1, (uint8_t *)in[8],HEAVY_MEM*32);
             // //11060 for one NUM_HEAVY.
             // // pData2 = pData1 + (NUM_HEAVY*factor+100)*HEAVY_PAIR_SIZE;
             // // delta = NUM_HEAVY*factor+100;
@@ -498,12 +498,12 @@ void ecall_fos_test(void *sa){
             //     bsItemDESC.sort(pData1, (NUM_HEAVY*factor+moreElem));
             //     bsItemDESC.sort(pData2, (NUM_HEAVY*factor+moreElem));
             // }
-            ///////memcpy(pData1, ((uint8_t **)(in[8]))[0] + 2 + CUSKETCH_MEM, HEAVY_MEM);
-            ///////memcpy(pData2, ((uint8_t **)(in[8]))[1] + 2 + CUSKETCH_MEM, HEAVY_MEM);
+            ///////memcpy(pData1, ((uint8_t **)(in[7]))[0] + 2 + CUSKETCH_MEM, HEAVY_MEM);
+            ///////memcpy(pData2, ((uint8_t **)(in[7]))[1] + 2 + CUSKETCH_MEM, HEAVY_MEM);
             //----------------------------------
             // //for merge the lower heavy part to the light part
             // pData = malloc_align((CUSKETCH_P2_MEM+HEAVY_MEM)*16, 64, &pData1);
-            // memcpy(pData1, (uint8_t *)in[9],(CUSKETCH_P2_MEM+HEAVY_MEM)*16);
+            // memcpy(pData1, (uint8_t *)in[8],(CUSKETCH_P2_MEM+HEAVY_MEM)*16);
             // // level = ceil(log2(HEAVY_MEM*1));
             // // length = 1 << level;
             // pData2 = pData1 + CUSKETCH_P2_MEM*16;
@@ -544,7 +544,7 @@ void ecall_fos_test(void *sa){
             //---------------------------------------------------------
             // printf("Test Decryption of two skwtches:");
             // for(int i=0; i<100; i++){
-            //     TestDecrypt((Message *)(in[8]), &ctx);
+            //     TestDecrypt((Message *)(in[7]), &ctx);
             // }
             //---------------------------------------------------------
             // printf("TestHeavyHitter:");
@@ -597,7 +597,7 @@ void ecall_fos_test(void *sa){
             // }
             //---------------------------------------------------------
             // printf("TestMergeLightPart_AVX:");
-            // //pData1 = (uint8_t *)in[9];
+            // //pData1 = (uint8_t *)in[8];
             // pData2 = pData1 + CUSKETCH_MEM*8;
             // // for(int i=0; i<100; i++){
             // //     printf("(%d %d)",pData1[i], pData2[i]);
@@ -641,7 +641,7 @@ void ecall_fos_test(void *sa){
             //     //TestLightCountDist_AVX();
             //     //TestLightCountDist();
             //     //TestLightCountDist_NO();
-            //     TestLightCountDist_AVX((uint8_t *)in[9], CUSKETCH_MEM/2);
+            //     TestLightCountDist_AVX((uint8_t *)in[8], CUSKETCH_MEM/2);
             // }
             //---------------------------------------------------------
             // printf("Test BuildSTable:");
@@ -668,14 +668,14 @@ void ecall_fos_test(void *sa){
     case 2: //Generating PORAM:
             printf("Generating Global Sketch:\n"
                   "--Generating OCUSketch:");
-            pOCUSketch = new FOSketch('C', in[7]);
+            pOCUSketch = new FOSketch('C', in[6]);
             pOCUSketch->setObliv(in[4]);
             printf("--Generating OSTable:");
-            pOSTable = new FOSketch('T', in[7]);
+            pOSTable = new FOSketch('T', in[6]);
             pOSTable->setObliv(in[4]);
             // printf("Test PORAM Performance:\n");
-            // // pOCUSketch = new FOSketch(1024*(cap_base+cap_del*in[2]), 8*(1<<in[1]), in[5], in[7]);
-            // pOCUSketch = new FOSketch(CAPACITY_UNIT*in[2], 8*(1<<in[1]), in[5], in[7]);
+            // // pOCUSketch = new FOSketch(1024*(cap_base+cap_del*in[2]), 8*(1<<in[1]), in[5], in[6]);
+            // pOCUSketch = new FOSketch(CAPACITY_UNIT*in[2], 8*(1<<in[1]), in[5], in[6]);
             // pOCUSketch->setObliv(in[4]);
             if(!pOCUSketch->initOK() || !pOSTable->initOK()){
                 free(pDataForCUSketch);
@@ -686,7 +686,7 @@ void ecall_fos_test(void *sa){
                 noMoreTest = 10;
             }
             break;
-    case 3: printf("Do more tests after the generation of OBS :");
+    case 3: printf("Do more tests after the generation of Global Sketch:");
             //printf("Test Insert Lower Heavy-hitters:");
             //mimic maxmerge the lower part to OCUSketch
             // for(int i=0;i<10;i++){
@@ -707,7 +707,7 @@ void ecall_fos_test(void *sa){
             pOCUSketch->shortInfo();
             pOSTable->shortInfo();
             break;
-    case 6: printf("Free the Global Sketch:");
+    case 6: printf("Free Global Sketch:");
             pOCUSketch->free_OCU();
             pOCUSketch = NULL;
             pOSTable->free_OCU();

@@ -55,7 +55,6 @@ typedef struct CDist
 // #define CAPACITY_DELTA 50
 #define CAPACITY_UNIT 1024
 #define CAPACITY_DEFALUT 450
-#define CUCKOO_KEYS 19200
 
 //#define TOTAL_MEM 600 * 1024    // 600 KB
 //#define HEAVY_MEM (150 * 1024)

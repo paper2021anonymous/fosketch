@@ -1,36 +1,5 @@
-# 需要忽略的临时文件
-*.pdf
-*.~vsdx
-!/Electronics/inputs/drawingFigs/*.pdf
-!/Electronics/Definitions/logo-updates.pdf
-
-/Electronics/inputs/Exported\ Items.bib
-
-*.aux
-*.bbl
-*.blg
-*.log
-*.out
-*.bak
-*.synctex.gz
-*.fdb_latexmk
-*.fls
-/XDUthesis/figures/
-
-#/.idea
-#/cmake-build-sgx-debug/
-#/cmake-build-debug/
-/fo-sketch-proj/data/
 *.so
 *.o
-#/.config_SIM_DEBUG_x64
 app
-test
-!bitonic.cpp
-bitonic
 Enclave_t.*
 Enclave_u.*
-*.exe
-
-acmart-primary.zip
-comment.cut
