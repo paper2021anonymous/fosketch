@@ -1135,6 +1135,49 @@ public:
     }
 
     void OCompressStash(){
+        //bool showStash = false;
+        size_t flagS = 0;
+        size_t insPos = 0;
+        // for(int curPos = 0; curPos < length_st; curPos++){
+        //     flagS = *(bid_t *) (stash+curPos*sizeBlock);
+        //     if(flagS != DUMMY_FLAG){
+        //         showStash = true;
+        //         break;
+        //     }
+        // }
+        // if(showStash){
+        //     printf("Test Compress by BitonicSorter of %u\n\tBefore", length_st);
+        //     for(int curPos = 0; curPos < length_st; curPos++){
+        //         flagS = *(bid_t *) (stash+curPos*sizeBlock);
+        //         printf("%u", flagS);
+        //     }
+        // }
+        BitonicSorter bs(&greater_SP,sizeBlock);
+        //bsItemDESC.sort((uint8_t *)HeavyHitterList, NUM_HEAVY*2);
+        bs.sort((uint8_t *)stash, length_st);
+        for(int curPos = 0; curPos < length_st; curPos++){
+            flagS = *(bid_t *) (stash+curPos*sizeBlock);
+            if(flagS != DUMMY_FLAG){
+                insPos++;
+            }
+        }
+
+        if(insPos > maxInitStash){
+            maxInitStash = insPos;
+        }
+        //if(insPos) printf("insPos %d", insPos);
+        //printf("StashLeagth from %d to %d", length_st, insPos);
+        length_st = (insPos < DEFAULT_STASH_LENGTH) ? DEFAULT_STASH_LENGTH : insPos;
+        // if(showStash){
+        //     printf("\tAfter, length_st = %u", length_st);
+        //     for(int curPos = 0; curPos < length_st; curPos++){
+        //         flagS = *(bid_t *) (stash+curPos*sizeBlock);
+        //         printf("%u", flagS);
+        //     }
+        // }
+    }
+
+    void compressStash(){
         size_t flagS = 0;
         size_t insPos = 0;
         size_t curPos = 0;
