@@ -952,6 +952,8 @@ Item *OResponseHeavyChange(float gamma){
     return respHC;
 }
 
+// #define FOS_TEST
+//#define SHOW_COMPRESS_STASH
 // #define COUNT_ACCESS
 
 //TODO: Need reconstruction for ease of use and human readable,
@@ -1112,9 +1114,12 @@ public:
                 + 2*2*sizeof(Item))*NUM_HEAVY
                 + 256*4) / MB;
         float stashSTableMemory = 1024.0 * ST_STASH_MEM / MB;
-        printf("(%c %c %c %dB %d %dKB %d %d %d S%d %.4fMB+%.4fKB+%.4fMB %dK +%d IS%d RS%d"
+        printf("(%c %c %c %dB %d %dKB %d %d %d S%d %.4fMB+%.4fKB+%.4fMB %dK +%d IS%d"
+#ifdef FOS_TEST
+                " RS%d"
 #ifdef COUNT_ACCESS
                 " at %d"
+#endif
 #endif
                 ") ",
                 sketchType,
@@ -1135,52 +1140,70 @@ public:
     }
 
     void OCompressStash(){
-        //bool showStash = false;
         size_t flagS = 0;
         size_t insPos = 0;
-        // for(int curPos = 0; curPos < length_st; curPos++){
-        //     flagS = *(bid_t *) (stash+curPos*sizeBlock);
-        //     if(flagS != DUMMY_FLAG){
-        //         showStash = true;
-        //         break;
-        //     }
-        // }
-        // if(showStash){
-        //     printf("Test Compress by BitonicSorter of %u\n\tBefore", length_st);
-        //     for(int curPos = 0; curPos < length_st; curPos++){
-        //         flagS = *(bid_t *) (stash+curPos*sizeBlock);
-        //         printf("%u", flagS);
-        //     }
-        // }
+        //This if-clause is just for test only, should be deleted in a production environment.
+#ifdef FOS_TEST
+#ifdef SHOW_COMPRESS_STASH
+        bool showStash = false;
+#endif
+        if(length_st > maxRealStash){
+            maxRealStash = length_st;
+#ifdef COUNT_ACCESS
+            maxAtAccess = numAccess;
+#endif
+        }
+#ifdef SHOW_COMPRESS_STASH
+        //Check stash with real block
+        for(int curPos = 0; curPos < length_st; curPos++){
+            flagS = *(bid_t *) (stash+curPos*sizeBlock);
+            if(flagS != DUMMY_FLAG){
+                showStash = true;
+                break;
+            }
+        }
+        if(showStash){
+            printf("Test Compress by BitonicSorter of %u\n\tBefore", length_st);
+            for(int curPos = 0; curPos < length_st; curPos++){
+                flagS = *(bid_t *) (stash+curPos*sizeBlock);
+                printf("%u", flagS);
+            }
+        }
+#endif
+#endif
         BitonicSorter bs(&greater_SP,sizeBlock);
         //bsItemDESC.sort((uint8_t *)HeavyHitterList, NUM_HEAVY*2);
         bs.sort((uint8_t *)stash, length_st);
         for(int curPos = 0; curPos < length_st; curPos++){
             flagS = *(bid_t *) (stash+curPos*sizeBlock);
-            if(flagS != DUMMY_FLAG){
-                insPos++;
-            }
+            insPos = OMove(insPos+1, insPos, flagS != DUMMY_FLAG);
         }
+        length_st = OMove(DEFAULT_STASH_LENGTH, insPos, insPos < DEFAULT_STASH_LENGTH);
+        // length_st = (insPos < DEFAULT_STASH_LENGTH) ? DEFAULT_STASH_LENGTH : insPos;
+        // if(insPos) printf("insPos %d", insPos);
+        // printf("StashLeagth from %d to %d", length_st, insPos);
 
+#ifdef FOS_TEST
         if(insPos > maxInitStash){
             maxInitStash = insPos;
         }
-        //if(insPos) printf("insPos %d", insPos);
-        //printf("StashLeagth from %d to %d", length_st, insPos);
-        length_st = (insPos < DEFAULT_STASH_LENGTH) ? DEFAULT_STASH_LENGTH : insPos;
-        // if(showStash){
-        //     printf("\tAfter, length_st = %u", length_st);
-        //     for(int curPos = 0; curPos < length_st; curPos++){
-        //         flagS = *(bid_t *) (stash+curPos*sizeBlock);
-        //         printf("%u", flagS);
-        //     }
-        // }
+#ifdef SHOW_COMPRESS_STASH
+        if(showStash){
+            printf("\tAfter, length_st = %u", length_st);
+            for(int curPos = 0; curPos < length_st; curPos++){
+                flagS = *(bid_t *) (stash+curPos*sizeBlock);
+                printf("%u", flagS);
+            }
+        }
+#endif
+#endif
     }
 
     void compressStash(){
         size_t flagS = 0;
         size_t insPos = 0;
         size_t curPos = 0;
+        //This i
         if(length_st > maxRealStash){
             maxRealStash = length_st;
 #ifdef COUNT_ACCESS
