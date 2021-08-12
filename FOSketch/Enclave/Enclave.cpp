@@ -696,12 +696,12 @@ void ecall_fos_test(void *sa){
             //pOSTable->BurstAccess(20000);
             break;
     case 4: printf("Burst Access Test:");
-            pOCUSketch->BurstAccess(in[3]);
-            pOSTable->BurstAccess(in[3]);
-            // pOCUSketch->BurstAccess(repeats*in[3]);
-            // pOSTable->BurstAccess(repeats*in[3]);
-            // pOCUSketch->LinearAccess(repeats*in[3]);
-            // pOSTable->LinearAccess(repeats*in[3]);
+            pOCUSketch->OBurstAccessFID(in[3]);
+            pOSTable->OBurstAccessFID(in[3]);
+            // pOCUSketch->BurstAccess(in[3]);
+            // pOSTable->BurstAccess(in[3]);
+            // pOCUSketch->LinearAccess(in[3]);
+            // pOSTable->LinearAccess(in[3]);
             break;
     case 5: printf("Show Short Info:");
             pOCUSketch->shortInfo();

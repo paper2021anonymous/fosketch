@@ -432,8 +432,8 @@ uint32_t OHeavyChange(size_t numHeavy, uint32_t numBucket,
 // }
 
 void OUpdateCUSketch_B(){
-    uint8_t nCounter = CACHE_LINE - 2*sizeof(bid_t);
-    uint32_t num1Block = CUSKETCH_MEM / nCounter;
+    uint8_t nRecord = CACHE_LINE - 2*sizeof(bid_t);
+    uint32_t num1Block = CUSKETCH_MEM / nRecord;
     uint32_t numBlock = num1Block + NUM_HEAVY;
     uint8_t level = ceil(log2(numBlock));
     numBlock = 1 << level; //OSort need the size of the data to be a power of 2.
@@ -455,7 +455,7 @@ void OUpdateCUSketch_B(){
     //process CUSketch array.
     for(int i=0; i<num1Block; i++) {
         dump[i].blockID = i;
-        memcpy((uint8_t *)(&dump[i].data), pDataCUSketch+i*nCounter, nCounter);
+        memcpy((uint8_t *)(&dump[i].data), pDataCUSketch+i*nRecord, nRecord);
     }
     //process Heavy hitter
     uint32_t cid;
@@ -464,11 +464,11 @@ void OUpdateCUSketch_B(){
     for(int i=0; i<NUM_HEAVY; i++) {
         cid = (SpookyHash::Hash32((void *)&HeavyHitterList[i+NUM_HEAVY].flowID,
                         FLOW_KEY_SIZE, cusHash)) % CUSKETCH_MEM;
-        dump[i+num1Block].blockID = cid / nCounter;
-        cidx = cid % nCounter;
+        dump[i+num1Block].blockID = cid / nRecord;
+        cidx = cid % nRecord;
         cnt = HeavyHitterList[i+NUM_HEAVY].size;
         cnt = OMove(255, cnt, cnt > 255);
-        for(int j=0;j<nCounter;j++){
+        for(int j=0;j<nRecord;j++){
             dump[i+num1Block].data[j] = OMove(cnt, 0, j == cidx);
         }
     }
@@ -493,12 +493,12 @@ void OUpdateCUSketch_B(){
     bsClASC.sort((uint8_t *)dump, numBlock);
 
     for(int i=0; i<num1Block; i++) {
-        memcpy(pDataCUSketch+i*nCounter, (uint8_t *)(&dump[i].data), nCounter);
+        memcpy(pDataCUSketch+i*nRecord, (uint8_t *)(&dump[i].data), nRecord);
     }
 
     // uint32_t test[5] = {2,5,0,1,0};
     // for(int i=0; i<5;i++){
-    //     assert(test[i]==pDataCUSketch[(i+251)*nCounter]);
+    //     assert(test[i]==pDataCUSketch[(i+251)*nRecord]);
     // }
     // printf("\nVerify the correctness11\n");
     // //Should set cusHash = 177 any fixed number in OPrepareData()
@@ -511,12 +511,12 @@ void OUpdateCUSketch_B(){
 //OUpdateCUSketch_BEx(pDataCUSketch,CUSKETCH_MEM,HeavyHitterList+NUM_HEAVY,NUM_HEAVY);
 void OUpdateCUSketch_BEx(uint8_t *pLight, size_t numLight, Item *pHeavy, size_t numHeavy){
     //auto t = Timer{BT_TABLE_MEM, __FUNCTION__};
-    uint8_t nCounter = CACHE_LINE - 2*sizeof(bid_t);
-    uint32_t numEBlock = numLight / nCounter;
+    uint8_t nRecord = CACHE_LINE - 2*sizeof(bid_t);
+    uint32_t numEBlock = numLight / nRecord;
     // uint8_t level = ceil(log2(numEBlock));
     // uint32_t num1Block = 1 << level;
     uint32_t num1Block = numEBlock;
-    //printf("%d, %d => %d, %d", numEBlock, numEBlock*nCounter, num1Block, num1Block*nCounter);
+    //printf("%d, %d => %d, %d", numEBlock, numEBlock*nRecord, num1Block, num1Block*nRecord);
     // level = ceil(log2(numHeavy));
     // uint32_t num2Block = 1 << level;
     uint32_t num2Block = numHeavy;
@@ -530,7 +530,7 @@ void OUpdateCUSketch_BEx(uint8_t *pLight, size_t numLight, Item *pHeavy, size_t 
     // isLightPo2 = false;
     // isHeavyPo2 = false;
     // uint8_t level = ceil(log2(numEBlock));
-    // size_t leng = (1L << level) * nCounter;
+    // size_t leng = (1L << level) * nRecord;
     // printf("Leng: %lu", leng);
     //make dummy block:
     // for(int i=numEBlock; i<num1Block; i++) {
@@ -541,13 +541,13 @@ void OUpdateCUSketch_BEx(uint8_t *pLight, size_t numLight, Item *pHeavy, size_t 
     // }
     // printf("\nXXX\n");
     // for(int i = 0; i<256; i++){
-    //     printf("%d ", pDataCUSketch[i*nCounter]);
+    //     printf("%d ", pDataCUSketch[i*nRecord]);
     // }
     //process CUSketch array.
     if(isLightPo2){
         for(int i=0; i<numEBlock; i++) {
             dump[i].blockID = i;
-            memcpy((uint8_t *)(&dump[i].data), pLight+i*nCounter, nCounter);
+            memcpy((uint8_t *)(&dump[i].data), pLight+i*nRecord, nRecord);
         }
         // printf("isLightPo2");
         // for(int i=0; i<50; i++){
@@ -556,7 +556,7 @@ void OUpdateCUSketch_BEx(uint8_t *pLight, size_t numLight, Item *pHeavy, size_t 
     } else {
         for(int i=numEBlock-1; i>=0; i--) {
             dump[i].blockID = i;
-            memcpy((uint8_t *)(&dump[i].data), pLight+i*nCounter, nCounter);
+            memcpy((uint8_t *)(&dump[i].data), pLight+i*nRecord, nRecord);
         }
         // printf("isNotLightPo2");
         // for(int i=0; i<50; i++){
@@ -575,14 +575,14 @@ void OUpdateCUSketch_BEx(uint8_t *pLight, size_t numLight, Item *pHeavy, size_t 
     for(int i=0; i<numHeavy; i++) {
         cid = (SpookyHash::Hash32((void *)&pHeavy[i].flowID,
                         FLOW_KEY_SIZE, cusHash)) % numLight;
-        dump2[i].blockID = cid / nCounter;
-        cidx = cid % nCounter;
+        dump2[i].blockID = cid / nRecord;
+        cidx = cid % nRecord;
         // printf("FlowID: %d, size: %d, cid %d, cidx: %d\n",
         //  HeavyHitterList[i+numHeavy].flowID,
         //  HeavyHitterList[i+numHeavy].size, cidx, cid);
         cnt = pHeavy[i].size;
         cnt = OMove(255, cnt, cnt > 255);
-        for(int j=0;j<nCounter;j++){
+        for(int j=0;j<nRecord;j++){
             dump2[i].data[j] = OMove(cnt, 0, j == cidx);
         }
         //printf("Data: %d, cidx: %d\n",dump[i+num1Block].data[cidx], cidx);
@@ -685,7 +685,7 @@ void OUpdateCUSketch_BEx(uint8_t *pLight, size_t numLight, Item *pHeavy, size_t 
     //     // printf("Yes, expected");
     // }
     for(int i=0; i<numEBlock; i++) {
-        memcpy(pLight+i*nCounter, (uint8_t *)(&dump[i].data), nCounter);
+        memcpy(pLight+i*nRecord, (uint8_t *)(&dump[i].data), nRecord);
         // if(i<50) printf("%i -> %i %d", i, dump[i].blockID,dump[i].data[0]);
     }
     return;
@@ -855,7 +855,6 @@ bool OPrepareData(Message * pMsgSketch, struct ctx_gcm_s *pCtx){
     //     printf("%x %d", HeavyHitterList[i].flowID, HeavyHitterList[i].size);
     // }
 
-
     //---------------------------------------------
     //Calculate Heavy-change candidates.
     //---------------------------------------------
@@ -882,6 +881,7 @@ bool OPrepareData(Message * pMsgSketch, struct ctx_gcm_s *pCtx){
     //---------------------------------------------
     //Calculate light part counter distribution.
     //---------------------------------------------
+    memset(CountLight, 0, 256*sizeof(uint32_t));
     for(int i=0; i<CUSKETCH_MEM;i++){
         OAdd256(1, pDataCUSketch[i], CountLight);
     }
@@ -896,7 +896,7 @@ bool OPrepareData(Message * pMsgSketch, struct ctx_gcm_s *pCtx){
     //---------------------------------------------
     //Calculate Cardinality.
     //---------------------------------------------
-    float ratio = 1.0*(CUSKETCH_MEM - CountLight[0]) / CUSKETCH_MEM;
+    float ratio = 1.0*CountLight[0] / CUSKETCH_MEM;
     Cardinality = -CUSKETCH_MEM * log(ratio);
     printf("\tLight part Cardinality: %zu", Cardinality);
     HHCountDistinct = 0;
@@ -976,7 +976,7 @@ class FOSketch {
     size_t size_sk = 0;
     uint16_t level = 0;
     size_t nLeaf = 0;
-    uint16_t nCounter = 0;
+    uint16_t nRecord = 0;
     uint8_t elemSize = 0;
     uint8_t payloadInd;
     size_t nBlock = 0;
@@ -1064,7 +1064,7 @@ public:
         sizeMaxStash = 0;
         level = 0;
         nLeaf = 0;
-        nCounter = 0;
+        nRecord = 0;
         elemSize = 0;
         payloadInd = 0;
         nBlock = 0;
@@ -1102,7 +1102,7 @@ public:
     void showInfo(){
         float totalMemory = 1.0*(nBlock*(sizeBlock+sizeof(bid_t))+nBucket*sizeBucket*sizeBlock)/ MB;
         printf("Block Size: %dB, Bucket Size: %d\n", sizeBlock, sizeBucket);
-        printf("Sketch Size: %dKB, Blocks: %d, Counters: %d\n", size_sk/1024, nBlock, nCounter);
+        printf("Sketch Size: %dKB, Blocks: %d, Counters: %d\n", size_sk/1024, nBlock, nRecord);
         printf("Tree Level: %d\n", level);
         printf("Mem Footprint: %fMB\n", totalMemory);
     }
@@ -1126,7 +1126,7 @@ public:
                 global_setOblivious ? 'O':'N',
                 needComStash ? 'C':'N',
                 sizeBlock, sizeBucket, size_sk/1024,
-                nBlock, level, nCounter, countStash, poramMemory,
+                nBlock, level, nRecord, countStash, poramMemory,
                 stashSTableMemory, metricMemory, global_repeat/1000, global_added, maxInitStash,
                 needComStash ? maxRealStash : length_st
 #ifdef COUNT_ACCESS
@@ -1403,7 +1403,7 @@ public:
                 if(flagS == DUMMY_FLAG){
                     *(bid_t *) (stash+i*sizeBlock) = bid;
                     *(bid_t *) (stash+i*sizeBlock+sizeof(bid_t)) = pos;
-                    memset(stash+i*sizeBlock+2*sizeof(bid_t), 0, nCounter);
+                    memset(stash+i*sizeBlock+2*sizeof(bid_t), 0, nRecord);
                     memcpy(Block, stash+i*sizeBlock, sizeBlock);
                     found = true;
                     global_added++;
@@ -1451,7 +1451,7 @@ public:
                 if(flagS == DUMMY_FLAG){
                     *(bid_t *) (stash+i*sizeBlock) = bid;
                     *(bid_t *) (stash+i*sizeBlock+sizeof(bid_t)) = pos;
-                    memset(stash+i*sizeBlock+2*sizeof(bid_t), 0, nCounter);
+                    memset(stash+i*sizeBlock+2*sizeof(bid_t), 0, nRecord);
                     memcpy(Block, stash+i*sizeBlock, sizeBlock);
                     found = true;
                     global_added++;
@@ -1509,7 +1509,7 @@ public:
                 if(flagS == DUMMY_FLAG){
                     *(bid_t *) (stash+i*sizeBlock) = bid;
                     *(bid_t *) (stash+i*sizeBlock+sizeof(bid_t)) = pos;
-                    memset(stash+i*sizeBlock+2*sizeof(bid_t), 0, nCounter);
+                    memset(stash+i*sizeBlock+2*sizeof(bid_t), 0, nRecord);
                     memcpy(Block, stash+i*sizeBlock, sizeBlock);
                     found = true;
                     global_added++;
@@ -1558,7 +1558,7 @@ public:
                 if(flagS == DUMMY_FLAG){
                     *(bid_t *) (stash+i*sizeBlock) = bid;
                     *(bid_t *) (stash+i*sizeBlock+sizeof(bid_t)) = pos;
-                    memset(stash+i*sizeBlock+2*sizeof(bid_t), 0, nCounter);
+                    memset(stash+i*sizeBlock+2*sizeof(bid_t), 0, nRecord);
                     memcpy(Block, stash+i*sizeBlock, sizeBlock);
                     found = true;
                     global_added++;
@@ -1807,8 +1807,8 @@ public:
     //[(- 24) (L N C 16B 5 450KB 38400 15 12 S0 5.1249MB+7.8125KB+0.7510MB 50000 +36 S0)] 
     uint32_t access(size_t index){
         uint32_t size =0;
-        size_t bid = index / nCounter;
-        uint16_t subIdx = index % nCounter;
+        size_t bid = index / nRecord;
+        uint16_t subIdx = index % nRecord;
         size_t leaf = 0;
         //assert(bid < nBlock);
         leaf = pos_map[bid];
@@ -1830,15 +1830,15 @@ public:
         return size;
     }
 
-    //#define PACS_STASH 10000
-    //static uint32_t countStash = 0;
-//        bool isbb = true;
-    uint32_t OAccess(size_t index){
-        uint32_t size = 0;
-        bid_t bid = index / nCounter;
-        uint16_t subIdx = index % nCounter;
+    bool OAccess(size_t index, uint8_t *Block){
+        bid_t bid;
+        if (sketchType == 'T'){
+            bid = index;
+        } else {
+            bid = index / nRecord;
+        }
         bid_t leaf = 0, dummy = 0;
-        uint16_t pace = (CACHE_LINE/sizeof(bid_t));
+        uint16_t pace = (CACHE_LINE/sizeof(bid_t)); //2^5
         size_t subCIdx = bid % pace;
 #ifdef COUNT_ACCESS
         numAccess++;
@@ -1864,7 +1864,7 @@ public:
 
         uint8_t Path[sizeBucket*sizeBlock*(level+1)];
         readPath(Path, leaf);
-        uint8_t Block[sizeBlock];
+        // uint8_t Block[sizeBlock];
         OWriteToStash(Path);
         bool isFound = OReadFromStash(bid, Block);
         ORebuildStash(Path, leaf);
@@ -1874,33 +1874,56 @@ public:
         //uint8_t test;
         if(!isFound){
             printf("x%dx", bid);
-        }else{//TODO: make it oblivious!
-            if(sketchType == 'C'){
-                size = ((uint8_t *)(Block+payloadInd))[subIdx];
-            } else if (sketchType == 'T'){
-                size = ((Item *)(Block+payloadInd))[subIdx].size;
+        }
+        return isFound;
+    }
+
+    // uint32_t OAccess(size_t index){
+    uint32_t OAccessFID(uint32_t flowID){
+        uint32_t size = 0;
+        size_t index;
+        uint16_t subIdx;
+        if (sketchType == 'T'){
+            index = (SpookyHash::Hash32((void *)&flowID,
+                       FLOW_KEY_SIZE, stHash)) % ST_BUCKET_NUM;
+        } else {
+            index = (SpookyHash::Hash32((void *)&flowID,
+                        FLOW_KEY_SIZE, cusHash)) % CUSKETCH_MEM;
+            subIdx = index % nRecord;
+        }
+
+        uint8_t Block[sizeBlock];
+        // bool isFound = OAccess(index, Block);
+        if(OAccess(index, Block)){//TODO: make it oblivious!
+            if(sketchType == 'T'){
+                for(int x=0; x<nRecord; x++){
+                    size = OMove(((Item *)(Block+payloadInd))[x].size, size,
+                        ((Item *)(Block+payloadInd))[x].flowID == flowID);
+                    // size = ((Item *)(Block+payloadInd))[subIdx].size;
+                }
             } else {
                 size = ((uint8_t *)(Block+payloadInd))[subIdx];
                 //test = OGet(Block, uint32_t *pArry)
             }
         }
 
-        bool isInSt = false;
-        uint32_t flowID = 1777;
+        // bool isInSt = false;
+        // uint32_t flowID = 1777;
         if (sketchType == 'T'){//countStash //pStashHeavy
             for(int i=0; i<countStash; i++){
                 size = OMove(pStashHeavy[i].size, size,
-                        (!isInSt && pStashHeavy[i].flowID == flowID));
-                isInSt = OMove(1, isInSt, pStashHeavy[i].flowID == flowID);
+                        pStashHeavy[i].flowID == flowID);
+                // isInSt = OMove(1, isInSt, pStashHeavy[i].flowID == flowID);
             }
         }
         return size;
     }
 
+
     uint8_t OAccess_S(size_t index){
         uint16_t size =-1;
-        size_t bid = index / nCounter;
-        uint16_t subIdx = index % nCounter;
+        size_t bid = index / nRecord;
+        uint16_t subIdx = index % nRecord;
         size_t leaf = 0, dummy = 0;
         for(int i=0; i<nBlock; i++) {
             if(i==bid){
@@ -1929,8 +1952,8 @@ public:
 
     uint8_t OAccess_F(size_t index){
         uint16_t size =-1;
-        size_t bid = index / nCounter;
-        uint16_t subIdx = index % nCounter;
+        size_t bid = index / nRecord;
+        uint16_t subIdx = index % nRecord;
         bid_t leaf = 0, dummy = 0;
         uint16_t pace = (CACHE_LINE/sizeof(bid_t));
         size_t subCIdx = bid % pace; 
@@ -1959,15 +1982,40 @@ public:
         return size;
     }
 
+    void OBurstAccessFID(uint32_t repeats){
+        //auto t = Timer{repeats*sizeBucket*sizeBlock*(level+1), __FUNCTION__};
+        // uint16_t scale = (sketchType == 'T') ? 1 : nRecord;
+        // printf("nBlock*scale: %u, ST_BUCKET_NUM: %u, CUSKETCH_MEM: %u\n", nBlock*scale,ST_BUCKET_NUM, CUSKETCH_MEM);
+        global_repeat = repeats*REPEAT_BASE;
+        uint32_t flowID;
+        for(uint64_t i=0; i<global_repeat; i++){
+            sgx_read_rand((unsigned char*)&flowID, sizeof(flowID));
+            // flowID = rand() % MAX_SIZE;
+            OAccessFID(flowID);
+        }
+
+        // if (sketchType == 'T'){
+        //     uint32_t size = 0;
+        //     for(int i=0; i< NUM_HEAVY; i++){
+        //         flowID = HeavyHitterList[i].flowID;
+        //         size = OAccessFID(flowID);
+        //         printf("flowID: %u, real size: %u, ORAM size: %u", 
+        //             flowID, HeavyHitterList[i].size, size);
+        //     }
+        // }
+    }
+
     void BurstAccess(uint32_t repeats){
         //auto t = Timer{repeats*sizeBucket*sizeBlock*(level+1), __FUNCTION__};
         global_repeat = repeats*REPEAT_BASE;
         size_t index;
+        uint8_t Block[sizeBlock];
+        uint16_t scale = (sketchType == 'T') ? 1 : nRecord;
         for(uint64_t i=0; i<global_repeat; i++){
-            index = rand() % (nBlock*nCounter);
+            index = rand() % (nBlock*scale);
             //index = rand() % nBlock;
             if(global_setOblivious){
-                OAccess(index);
+                OAccess(index, Block);
             }else{
                 access(index);
             }
@@ -1979,11 +2027,13 @@ public:
         //printf("repeats: %d\n", repts);
         //auto t = Timer{repts*sizeBucket*sizeBlock*(level+1), __FUNCTION__};
         global_repeat = repts;
+        uint8_t Block[sizeBlock];
+        uint16_t scale = (sketchType == 'T') ? 1 : nRecord;
         for(int i=0; i<repts; i++){
             if(global_setOblivious){
-                OAccess(i*nCounter);
+                OAccess(i*scale, Block);
             }else{
-                access(i*nCounter);
+                access(i*scale);
             }
         }
     }
@@ -1995,33 +2045,36 @@ public:
         size_sk = w_sk;
         // printf("size_sk is %lu\n", size_sk);
         needComStash = compStash;
-        nBlock = ceil(1.0*size_sk/(sizeBlock-2*sizeof(bid_t)));
+        if(sketchType == 'C'){
+            nBlock = ceil(1.0*size_sk/(sizeBlock-2*sizeof(bid_t)));
+            nRecord = (sizeBlock - 2*sizeof(bid_t)) / sizeof(uint8_t);
+            elemSize = 1;
+            payloadInd = 2*sizeof(bid_t);
+            pSource = pDataCUSketch;
+        }else if(sketchType == 'T'){
+            nBlock = ceil(1.0*size_sk/(sizeBlock-sizeof(Item)));
+            nRecord = (sizeBlock - 2*sizeof(bid_t)) / sizeof(Item);
+            elemSize = sizeof(Item);
+            payloadInd = sizeof(Item); //sizeof(Item) == HEAVY_PAIR_SIZE
+            pSource = (uint8_t *)pDataStashTable;
+        } else {
+            nRecord = (sizeBlock - 2*sizeof(bid_t)) / sizeof(uint8_t);
+            elemSize = 1;
+            payloadInd = 2*sizeof(bid_t);
+            pSource = pDataCUSketch;
+        }
+        
         level = floor(log2(nBlock));
-        BitonicSorter bs(&greater_FOS,sizeBlock);
         if(level >= sizeof(bid_t)*8){
             printf("Level (%d) >= %d bits! not allowed. Need resize the type of Block ID!",
                 level, sizeof(bid_t)*8);
             return false;
         }
         nLeaf = 1<<level;
-        if(sketchType == 'C'){
-            nCounter = (sizeBlock - 2*sizeof(bid_t)) / sizeof(uint8_t);
-            elemSize = 1;
-            payloadInd = 2*sizeof(bid_t);
-            pSource = pDataCUSketch;
-        }else if(sketchType == 'T'){
-            nCounter = (sizeBlock - 2*sizeof(bid_t)) / sizeof(Item);
-            elemSize = sizeof(Item);
-            payloadInd = sizeof(Item); //sizeof(Item) == HEAVY_PAIR_SIZE
-            pSource = (uint8_t *)pDataStashTable;
-        } else {
-            nCounter = (sizeBlock - 2*sizeof(bid_t)) / sizeof(uint8_t);
-            elemSize = 1;
-            payloadInd = 2*sizeof(bid_t);
-            pSource = pDataCUSketch;
-        }
         nBucket = (1 << (level+1)) -1; //1024*2
         //shortInfo();
+
+        BitonicSorter bs(&greater_FOS,sizeBlock);
 
         data = malloc_align(nBlock*sizeBlock, sizeBlock, &sk);
         sizeMaxStash = sizeBlock * MAX_STASH_NUM;
@@ -2082,10 +2135,10 @@ public:
                 //array[j] = (pos_map[j])>>(level-i);
                 *(bid_t *) (sk+j*sizeBlock) = j;
                 *(bid_t *)(sk+j*sizeBlock+sizeof(bid_t)) = pos_map[j];
-                //memset(sk+j*sizeBlock+payloadInd, 7, nCounter);
-                memcpy(sk+j*sizeBlock+payloadInd, pSource+j*nCounter*elemSize, (sizeBlock-payloadInd));
+                //memset(sk+j*sizeBlock+payloadInd, 7, nRecord);
+                memcpy(sk+j*sizeBlock+payloadInd, pSource+j*nRecord*elemSize, (sizeBlock-payloadInd));
                 // if(j==20){
-                //     for(int x=0;x<nCounter;x++){
+                //     for(int x=0;x<nRecord;x++){
                 //         printf("%d -> %d", x, (sk+j*sizeBlock+payloadInd)[x]);
                 //     }
                 // }
