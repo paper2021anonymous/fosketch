@@ -96,7 +96,7 @@ bool OBuildSTable(){
     for(int i=0; i<NUM_HEAVY; i++){
         pSP[i].index = abs(rand()%ST_BUCKET_NUM);//ST_BUCKET_NUM
         //TODO Be careful: Just for test, Force each flow id is unique.!!!!!!!!!!!!!!!
-        HeavyHitterList[i].flowID = i;
+        HeavyHitterList[i].flowID = i+1;
         pSP[i].elem = HeavyHitterList[i];
     }
     
